@@ -1,9 +1,11 @@
 require('dotenv').config();
 require('./config/database'); // connects to db
+const cors = require('cors');
 const express = require('express');
 const path = require('path'); // node module
 const favicon = require('serve-favicon');
 const logger = require('morgan');
+const ensureLoggedIn = require('./config/ensureLoggedIn')
 
 const app = express();
 // development port: 3001
@@ -15,6 +17,7 @@ const PORT = process.env.PORT || 3001;
 //* Config
 // Logger middleware
 app.use(logger('dev'));
+app.use(cors());
 // JSON payload middleware (for data coming from frontend functions)
 app.use(express.json());
 // Configure both serve-favicon & static middleware
@@ -29,7 +32,8 @@ app.use(require('./config/checkToken'))
 
 // * All other routes
 app.use('/api/users', require('./routes/api/users'));
-
+app.use('/api/items', ensureLoggedIn, require('./routes/api/items'));
+app.use('/api/orders', ensureLoggedIn, require('./routes/api/orders'));
 
 
 // Put API routes here, before the "catch all" route
